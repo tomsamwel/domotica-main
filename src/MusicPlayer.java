@@ -1,6 +1,7 @@
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import java.awt.*;
 import java.io.File;
 import java.io.FilenameFilter;
 
@@ -37,38 +38,38 @@ public class MusicPlayer {
         return false;
     }
 
-    private void selectSong(int index){
+    public void selectSong(int index){
+        if (isPlaying){
+            clip.stop();
+        }
+        clipTimePos = 0;
+
         try {
-            System.out.println(songs[song]);
             song = index;
 
             AudioInputStream audioInput = AudioSystem.getAudioInputStream(songs[song]);
             clip = AudioSystem.getClip();
             clip.open(audioInput);
+
+            if (isPlaying) play();
         } catch (Exception e){
             System.out.println(e.getMessage());
         }
     }
 
     public void next(){
-        clip.stop();
 
         if (song + 1 >= songs.length){
             selectSong(0);
         } else selectSong(song+1);
-        clipTimePos = 0;
 
-        if (isPlaying) play();
     }
 
     public void previous(){
-        clip.stop();
 
         if (song - 1 < 0) selectSong(songs.length - 1);
         else selectSong(song-1);
-        clipTimePos = 0;
 
-        if (isPlaying) play();
     }
 
     void play(){
@@ -90,5 +91,9 @@ public class MusicPlayer {
     public String getSongName(){
         String filename = songs[song].getName();
         return filename.substring(0, filename.length()-4);
+    }
+
+    public File[] getSongs(){
+        return songs;
     }
 }
