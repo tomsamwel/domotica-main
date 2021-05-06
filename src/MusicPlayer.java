@@ -1,15 +1,13 @@
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
-import java.awt.*;
 import java.io.File;
-import java.io.FilenameFilter;
 
 public class MusicPlayer {
     static Clip clip;
 
     static String musicPath = "music";
-    static File songs[];
+    static File[] songs;
     public int song = 0;
     public static long clipTimePos = 0;
 
@@ -21,21 +19,15 @@ public class MusicPlayer {
 
     }
 
-    public Boolean loadMusic(){
+    public void loadMusic(){
         try {
-            songs = new File(musicPath).listFiles(new FilenameFilter() {
-                public boolean accept(File dir, String name) {
-                    return name.toLowerCase().endsWith(".wav");
-                }
-            });
+            songs = new File(musicPath).listFiles((dir, name) -> name.toLowerCase().endsWith(".wav"));
             selectSong(0);
-            return true;
-        }catch (Exception e){
+        } catch (Exception e){
             System.out.println("failed to load");
             System.out.println(e.getMessage());
         }
         System.out.println("file doesn't exist");
-        return false;
     }
 
     public void selectSong(int index){
@@ -95,5 +87,13 @@ public class MusicPlayer {
 
     public File[] getSongs(){
         return songs;
+    }
+
+    public boolean isPlaying(){
+        return isPlaying;
+    }
+
+    public boolean isLooping(){
+        return isLooping;
     }
 }
