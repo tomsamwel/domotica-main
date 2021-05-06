@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="MusicPlayerGUI">
+  <grid id="27dc6" binding="controls" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+    <constraints>
+      <xy x="20" y="20" width="500" height="400"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <component id="8820" class="javax.swing.JButton" binding="previousButton">
+        <constraints/>
+        <properties>
+          <text value="|&lt;"/>
+        </properties>
+      </component>
+      <component id="6711c" class="javax.swing.JButton" binding="playButton">
+        <constraints/>
+        <properties>
+          <text value="play"/>
+        </properties>
+      </component>
+      <component id="cbffb" class="javax.swing.JButton" binding="nextButton">
+        <constraints/>
+        <properties>
+          <text value="&gt;|"/>
+        </properties>
+      </component>
+    </children>
+  </grid>
+</form>
