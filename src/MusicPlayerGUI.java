@@ -7,8 +7,9 @@ public class MusicPlayerGUI extends javax.swing.JFrame{
     private JPanel controls;
     private JButton playButton;
     private JButton nextButton;
+    private JLabel songLabel;
 
-    static MusicPlayer player = MusicPlayer.getInstance();
+    MusicPlayer player = new MusicPlayer();
 
 
     MusicPlayerGUI(){
@@ -17,7 +18,9 @@ public class MusicPlayerGUI extends javax.swing.JFrame{
         pack();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);//specifying close operation
 
+
         player.loadMusic();
+        songLabel.setText(player.getSongName());
 
         this.playButton.addActionListener(new ActionListener() {
             @Override
@@ -25,12 +28,26 @@ public class MusicPlayerGUI extends javax.swing.JFrame{
                 if (player.isPlaying){
                     player.pause();
                     MusicPlayerGUI.this.playButton.setText("play");
-                    pack();
                 } else {
                     player.play();
                     MusicPlayerGUI.this.playButton.setText("pause");
-                    pack();
                 }
+            }
+        });
+        previousButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                player.previous();
+                songLabel.setText(player.getSongName());
+
+            }
+        });
+        nextButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                player.next();
+                songLabel.setText(player.getSongName());
+
             }
         });
     }
