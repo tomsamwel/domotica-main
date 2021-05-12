@@ -1,10 +1,17 @@
+import java.util.Timer;
+
 public class Main {
     public static void main(String[] args) {
 //        MusicPlayerGUI gui = new MusicPlayerGUI();
-        Database db = new Database();
-        db.connect();
-        Object[] result = db.queryOne("SELECT * FROM users WHERE id = ?", "1");
-        System.out.println(result[1]);
+//        Database db = new Database();
+//        db.connect();
+//        Object[] result = db.queryOne("SELECT * FROM users WHERE id = ?", "2");
+//        System.out.println(result[1]);
 
+        DomoticaGUI domo = new DomoticaGUI();
+
+        // initialize timer to get refresh data every 5 seconds
+        Timer timer = new Timer();
+        timer.schedule(domo, 0, 5000);
     }
 }

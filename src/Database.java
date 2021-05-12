@@ -34,6 +34,20 @@ public class Database {
         return result;
     }
 
+    public Object[] queryOne(String query){
+        if (conn == null) connect();
+
+        Object[] result = new Object[0];
+
+        try{
+            result = run.query(conn, query, h);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
     // Create a ResultSetHandler implementation to convert the
     // first row into an Object[].
     ResultSetHandler<Object[]> h = rs -> {
@@ -52,6 +66,21 @@ public class Database {
         return result;
     };
 
+    public Object[] getTemperature(){
+        return queryOne("SELECT * FROM `temperature` ORDER BY id DESC LIMIT 1");
+    }
+
+    public Object[] getPressure(){
+        return queryOne("SELECT * FROM `pressure` ORDER BY id DESC LIMIT 1");
+    }
+
+    public Object[] getLight(){
+        return queryOne("SELECT * FROM `light` ORDER BY id DESC LIMIT 1");
+    }
+
+    public Object[] getHumidity(){
+        return queryOne("SELECT * FROM `humidity` ORDER BY id DESC LIMIT 1");
+    }
 
 }
 

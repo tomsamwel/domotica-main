@@ -1,4 +1,6 @@
 import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 
 public class MusicPlayerGUI extends javax.swing.JFrame {
@@ -8,6 +10,7 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
     private JButton nextButton;
     private JLabel songLabel;
     private JList songList;
+    private JButton loopButton;
 
     MusicPlayer player = new MusicPlayer();
 
@@ -20,7 +23,7 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
 
 
         player.loadMusic();
-        songList.setListData(player.getSongs());
+        songList.setListData(player.getSongNames());
         refreshTexts();
         pack();
 
@@ -51,6 +54,10 @@ public class MusicPlayerGUI extends javax.swing.JFrame {
                 player.selectSong(songList.getSelectedIndex());
                 refreshTexts();
             }
+        });
+        loopButton.addActionListener(e -> {
+            player.toggleLooping();
+            loopButton.setText(player.isLooping() ? "stop looping" : "loop");
         });
     }
 
