@@ -26,7 +26,8 @@ public class Database {
         Object[] result = new Object[0];
 
         try{
-            result = run.query(conn, query, h, param);
+            if (param == null) result = run.query(conn, query, h);
+            else result = run.query(conn, query, h, param);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -35,17 +36,7 @@ public class Database {
     }
 
     public Object[] queryOne(String query){
-        if (conn == null) connect();
-
-        Object[] result = new Object[0];
-
-        try{
-            result = run.query(conn, query, h);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return result;
+        return queryOne(query, null);
     }
 
     // Create a ResultSetHandler implementation to convert the
