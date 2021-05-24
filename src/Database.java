@@ -1,5 +1,8 @@
 import org.apache.commons.dbutils.*;
+import org.apache.commons.dbutils.handlers.BeanListHandler;
+
 import java.sql.*;
+import java.util.List;
 
 public class Database {
     static final String DB_URL = "jdbc:mysql://localhost/domotica";
@@ -18,6 +21,20 @@ public class Database {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public int updateOne(String query){
+        if (conn == null) connect();
+
+        int result = 0;
+
+        try{
+            result = run.update(conn, query);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
     }
 
     public Object[] queryOne(String query, String param){
@@ -39,6 +56,21 @@ public class Database {
         return queryOne(query, null);
     }
 
+    public List<User> getUsers(){
+        if (conn == null) connect();
+
+        try{
+            return run.query(conn, "SELECT * FROM users", hu);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    ResultSetHandler<List<User>> hu
+            = new BeanListHandler<>(User.class);
+
     // Create a ResultSetHandler implementation to convert the
     // first row into an Object[].
     ResultSetHandler<Object[]> h = rs -> {
@@ -56,6 +88,30 @@ public class Database {
 
         return result;
     };
+
+    // Create a ResultSetHandler implementation to convert the
+    // first row into an Object[].
+//    ResultSetHandler<Object[][]> mh = rs -> {
+//        rs.last();
+//        int size = rs.getRow();
+//        Object[][] result = new Object[size][];
+//        rs.first();
+//
+//        while (rs.next()){
+//
+//            ResultSetMetaData meta = rs.getMetaData();
+//            int cols = meta.getColumnCount();
+//            Object[] row = new Object[cols];
+//
+//            for (int i = 0; i < cols; i++) {
+//                row[i] = rs.getObject(i + 1);
+//            }
+//            result[rs.getRow()] = row;
+//        }
+//        return result;
+//    };
+
+
 
     public Object[] getTemperature(){
         return queryOne("SELECT * FROM `temperature` ORDER BY id DESC LIMIT 1");
