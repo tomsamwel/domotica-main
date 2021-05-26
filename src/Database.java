@@ -1,8 +1,11 @@
 import org.apache.commons.dbutils.*;
+import org.apache.commons.dbutils.handlers.ArrayListHandler;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
+import org.apache.commons.dbutils.handlers.MapListHandler;
 
 import java.sql.*;
 import java.util.List;
+import java.util.Map;
 
 public class Database {
     static final String DB_URL = "jdbc:mysql://localhost/domotica";
@@ -14,21 +17,21 @@ public class Database {
     // Create a QueryRunner that will use connections
     QueryRunner run = new QueryRunner();
 
-    void connect(){
+    void connect() {
         // Open a connection
-        try{
+        try {
             conn = DriverManager.getConnection(DB_URL, USER, PASS);
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public int updateOne(String query){
+    public int updateOne(String query) {
         if (conn == null) connect();
 
         int result = 0;
 
-        try{
+        try {
             result = run.update(conn, query);
         } catch (Exception e) {
             e.printStackTrace();
@@ -37,12 +40,12 @@ public class Database {
         return result;
     }
 
-    public Object[] queryOne(String query, String param){
+    public Object[] queryOne(String query, String param) {
         if (conn == null) connect();
 
         Object[] result = new Object[0];
 
-        try{
+        try {
             if (param == null) result = run.query(conn, query, h);
             else result = run.query(conn, query, h, param);
         } catch (Exception e) {
@@ -52,14 +55,14 @@ public class Database {
         return result;
     }
 
-    public Object[] queryOne(String query){
+    public Object[] queryOne(String query) {
         return queryOne(query, null);
     }
 
-    public List<User> getUsers(){
+    public List<User> getUsers() {
         if (conn == null) connect();
 
-        try{
+        try {
             return run.query(conn, "SELECT * FROM users", hu);
         } catch (Exception e) {
             e.printStackTrace();
@@ -89,43 +92,42 @@ public class Database {
         return result;
     };
 
-    // Create a ResultSetHandler implementation to convert the
-    // first row into an Object[].
-//    ResultSetHandler<Object[][]> mh = rs -> {
-//        rs.last();
-//        int size = rs.getRow();
-//        Object[][] result = new Object[size][];
-//        rs.first();
-//
-//        while (rs.next()){
-//
-//            ResultSetMetaData meta = rs.getMetaData();
-//            int cols = meta.getColumnCount();
-//            Object[] row = new Object[cols];
-//
-//            for (int i = 0; i < cols; i++) {
-//                row[i] = rs.getObject(i + 1);
-//            }
-//            result[rs.getRow()] = row;
-//        }
-//        return result;
-//    };
+    List<Map<String, Object>> queryMap(String query) {
+        try {
+            List<Map<String, Object>> result = run.query(
+                    conn, query, new MapListHandler());
+            return result;
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return null;
+    }
+
+    List<Object[]> queryArray(String query) {
+        try {
+            List<Object[]> result = run.query(
+                    conn, query, new ArrayListHandler());
+            return result;
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return null;
+    }
 
 
-
-    public Object[] getTemperature(){
+    public Object[] getTemperature() {
         return queryOne("SELECT * FROM `temperature` ORDER BY id DESC LIMIT 1");
     }
 
-    public Object[] getPressure(){
+    public Object[] getPressure() {
         return queryOne("SELECT * FROM `pressure` ORDER BY id DESC LIMIT 1");
     }
 
-    public Object[] getLight(){
+    public Object[] getLight() {
         return queryOne("SELECT * FROM `light` ORDER BY id DESC LIMIT 1");
     }
 
-    public Object[] getHumidity(){
+    public Object[] getHumidity() {
         return queryOne("SELECT * FROM `humidity` ORDER BY id DESC LIMIT 1");
     }
 
