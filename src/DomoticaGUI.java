@@ -3,19 +3,18 @@ import javax.swing.plaf.DimensionUIResource;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import java.awt.*;
-import java.util.*;
 import java.util.List;
 import java.util.Timer;
+import java.util.*;
 
 
 public class DomoticaGUI extends TimerTask {
-    JFrame f;
+    private final JFrame f;
+    private final Database db = new Database();
+    private User user;
     private JTable domoticaTable;
     private JPanel panel;
     private JTabbedPane tabs;
-
-    Database db = new Database();
-    User user;
 
     DomoticaGUI() {
         // Frame initialization
@@ -27,7 +26,6 @@ public class DomoticaGUI extends TimerTask {
 
         initUserSelect();
 
-
         // Frame Visible = true
         f.setVisible(true);
     }
@@ -37,6 +35,7 @@ public class DomoticaGUI extends TimerTask {
         updateMeasurementsTable();
     }
 
+    //instantiate the measurements table
     void initMeasurementsTable() {
         String[][] data = {
                 {"Temperatuur", "-", "", ""},
@@ -52,29 +51,17 @@ public class DomoticaGUI extends TimerTask {
         // adding it to JScrollPane
         JScrollPane sp = new JScrollPane(domoticaTable);
 
+        // add a timer schedule to update the data every 5s
         Timer timer = new Timer();
         timer.schedule(this, 0, 5000);
-
-
-        domoticaTable.addPropertyChangeListener(evt -> {
-            if (!domoticaTable.isEditing()) {
-                int row = domoticaTable.getEditingRow();
-                int column = domoticaTable.getEditingColumn();
-
-                if (row == 0)
-                    user.setTemperatureConfig(Integer.parseInt((String) domoticaTable.getValueAt(row, column)));
-                if (row == 1) user.setLightConfig(Integer.parseInt((String) domoticaTable.getValueAt(row, column)));
-            }
-        });
 
         tabs.addTab("Overzicht", sp);
 
         f.revalidate();
-
     }
 
+    //Update all measurements in the table
     public void updateMeasurementsTable() {
-        System.out.println("updating data...");
         try {
             Object[] temperature = db.getTemperature();
             domoticaTable.setValueAt(temperature[1].toString(), 0, 1);
@@ -106,18 +93,22 @@ public class DomoticaGUI extends TimerTask {
         } catch (Exception e) {
             System.out.println("Failed to retrieve humidity");
         }
-
-
     }
 
+    // create the user selection panel
     void initUserSelect() {
         f.setTitle("Welkom! Selecteer de gebruiker");
 
+        // load all users and display them as buttons
         List<User> users = db.getUsers();
         users.forEach(user -> {
             JButton userButton = new JButton(user.getName());
+
+            // random color per user for style
             Random rand = new Random();
             userButton.setForeground(new Color(rand.nextInt(255), rand.nextInt(255), rand.nextInt(255)));
+
+            // select a user and switch to domotica panel
             userButton.addActionListener(e -> {
                 this.user = user;
                 f.remove(panel);
@@ -125,8 +116,24 @@ public class DomoticaGUI extends TimerTask {
                 initDomotica();
             });
             panel.add(userButton);
-
         });
+
+        // fields for a new user
+        JTextField newUserInput = new JTextField("Nieuwe gebruiker");
+        JButton newUserButton = new JButton("Maak aan");
+
+        // insert new user and use as current user
+        newUserButton.addActionListener(e -> {
+            user = new User();
+            db.newUser(newUserInput.getText());
+            user.loadUser(newUserInput.getText());
+            f.remove(panel);
+            f.setTitle("Domotica - " + newUserInput.getText());
+            initDomotica();
+        });
+
+        panel.add(newUserInput);
+        panel.add(newUserButton);
         f.add(panel);
 
     }

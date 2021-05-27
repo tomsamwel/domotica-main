@@ -1,76 +1,22 @@
-import org.apache.commons.dbutils.*;
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.ResultSetHandler;
 import org.apache.commons.dbutils.handlers.ArrayListHandler;
+import org.apache.commons.dbutils.handlers.BeanHandler;
 import org.apache.commons.dbutils.handlers.BeanListHandler;
-import org.apache.commons.dbutils.handlers.MapListHandler;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 public class Database {
     static final String DB_URL = "jdbc:mysql://localhost/domotica";
     static final String USER = "root";
     static final String PASS = "root";
-
-    private Connection conn;
-
     // Create a QueryRunner that will use connections
     QueryRunner run = new QueryRunner();
-
-    void connect() {
-        // Open a connection
-        try {
-            conn = DriverManager.getConnection(DB_URL, USER, PASS);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public int updateOne(String query) {
-        if (conn == null) connect();
-
-        int result = 0;
-
-        try {
-            result = run.update(conn, query);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return result;
-    }
-
-    public Object[] queryOne(String query, String param) {
-        if (conn == null) connect();
-
-        Object[] result = new Object[0];
-
-        try {
-            if (param == null) result = run.query(conn, query, h);
-            else result = run.query(conn, query, h, param);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return result;
-    }
-
-    public Object[] queryOne(String query) {
-        return queryOne(query, null);
-    }
-
-    public List<User> getUsers() {
-        if (conn == null) connect();
-
-        try {
-            return run.query(conn, "SELECT * FROM users", hu);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return null;
-    }
-
+    ResultSetHandler<User> userHandler = new BeanHandler<>(User.class);
     ResultSetHandler<List<User>> hu
             = new BeanListHandler<>(User.class);
 
@@ -91,29 +37,81 @@ public class Database {
 
         return result;
     };
+    private Connection conn;
 
-    List<Map<String, Object>> queryMap(String query) {
+    void connect() {
+        // Open a connection
         try {
-            List<Map<String, Object>> result = run.query(
-                    conn, query, new MapListHandler());
-            return result;
+            conn = DriverManager.getConnection(DB_URL, USER, PASS);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public int updateOne(String query) {
+        if (conn == null) connect();
+
+        try {
+            return run.update(conn, query);
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    public User newUser(String name) {
+        if (conn == null) connect();
+
+        try {
+            return run.insert(conn, "INSERT INTO `users` (name) VALUES (?)", userHandler, name);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public Object[] queryOne(String query, String param) {
+        if (conn == null) connect();
+
+        Object[] result = new Object[0];
+
+        try {
+            if (param == null) return run.query(conn, query, h);
+            else return run.query(conn, query, h, param);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return result;
+    }
+
+    public Object[] queryOne(String query) {
+        return queryOne(query, null);
+    }
+
+    public List<User> getUsers() {
+        if (conn == null) connect();
+
+        try {
+            return run.query(conn, "SELECT * FROM users", hu);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }
+
 
     List<Object[]> queryArray(String query) {
         try {
-            List<Object[]> result = run.query(
+            return run.query(
                     conn, query, new ArrayListHandler());
-            return result;
         } catch (Exception e) {
             System.out.println(e);
         }
         return null;
     }
-
 
     public Object[] getTemperature() {
         return queryOne("SELECT * FROM `temperature` ORDER BY id DESC LIMIT 1");
